@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utility Software — Downloads</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --orange: #d29922; --red: #f85149;
+    --radius: 10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+    min-height: 100vh;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  header { text-align: center; padding: 3rem 0 2rem; }
+  header h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: .4rem; }
+  header p  { color: var(--muted); font-size: 1.1rem; }
+
+  .project {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem;
+  }
+  .project-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .project-header h2 { font-size: 1.6rem; }
+  .badge {
+    display: inline-block; font-size: .75rem; font-weight: 600;
+    padding: .2em .6em; border-radius: 4px; vertical-align: middle;
+  }
+  .badge-release  { background: rgba(63,185,80,.15); color: var(--green); border: 1px solid rgba(63,185,80,.3); }
+  .badge-ci       { background: rgba(88,166,255,.12); color: var(--accent); border: 1px solid rgba(88,166,255,.25); }
+  .project-desc { color: var(--muted); margin-bottom: 1.5rem; }
+
+  .section-label {
+    font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); font-weight: 600; margin-bottom: .6rem;
+  }
+  .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .8rem; margin-bottom: 1.5rem; }
+  .dl-card {
+    display: flex; align-items: center; gap: .8rem;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: .9rem 1rem; transition: border-color .15s;
+  }
+  .dl-card:hover { border-color: var(--accent); text-decoration: none; }
+  .dl-icon { font-size: 1.6rem; flex-shrink: 0; width: 2rem; text-align: center; }
+  .dl-info { min-width: 0; }
+  .dl-platform { font-weight: 600; font-size: .95rem; }
+  .dl-meta { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .links-row { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: .9rem; }
+  .links-row a { display: inline-flex; align-items: center; gap: .3rem; }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--orange); }
+  .dot-red    { background: var(--red); }
+
+  footer { text-align: center; padding: 2rem 0; color: var(--muted); font-size: .85rem; }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.8rem; }
+    .project { padding: 1.2rem; }
+    .downloads { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Utility Software</h1>
+    <p>Cross-platform developer tools by <a href="https://github.com/psglinux">psglinux</a></p>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- GotiKinesis -->
+  <!-- ============================================================ -->
+  <div class="project" id="gotikinesis">
+    <div class="project-header">
+      <h2>GotiKinesis (GK)</h2>
+      <span class="badge badge-release" id="gk-version"><span class="spinner"></span></span>
+      <span class="badge badge-ci" id="gk-ci"><span class="spinner"></span></span>
+    </div>
+    <p class="project-desc">
+      Cross-platform SCP / FTP / TFTP file transfer utility with Qt6 GUI and CLI.
+    </p>
+
+    <!-- Latest Release -->
+    <div id="gk-release-section" style="display:none">
+      <div class="section-label">Latest Release</div>
+      <div class="downloads" id="gk-release-downloads"></div>
+    </div>
+
+    <!-- Latest CI Build -->
+    <div id="gk-ci-section">
+      <div class="section-label">Latest CI Build (artifacts)</div>
+      <div class="downloads" id="gk-ci-downloads">
+        <a class="dl-card" href="https://github.com/psglinux/scp-ftp-tftp/actions" target="_blank">
+          <span class="dl-icon">&#9881;</span>
+          <div class="dl-info">
+            <div class="dl-platform">GitHub Actions</div>
+            <div class="dl-meta">Download artifacts from latest run</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="links-row">
+      <a href="https://github.com/psglinux/scp-ftp-tftp" target="_blank">&#128193; Source Code</a>
+      <a href="https://github.com/psglinux/scp-ftp-tftp/releases" target="_blank">&#128230; All Releases</a>
+      <a href="https://github.com/psglinux/scp-ftp-tftp/actions" target="_blank">&#128736; CI/CD</a>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Add more projects here in the future                         -->
+  <!-- ============================================================ -->
+
+  <footer>
+    <p>&copy; 2026 psglinux &middot; Powered by <a href="https://pages.github.com">GitHub Pages</a></p>
+  </footer>
+</div>
+
+<script>
+const OWNER = 'psglinux';
+
+const PROJECTS = [
+  {
+    repo: 'scp-ftp-tftp',
+    prefix: 'gk',
+    platforms: [
+      { os: 'Linux',   icon: '&#128039;', ext: '.deb',  label: 'Debian / Ubuntu' },
+      { os: 'Windows', icon: '&#128187;', ext: '.exe',  label: 'Windows Installer' },
+      { os: 'Windows', icon: '&#128230;', ext: '.zip',  label: 'Windows ZIP' },
+      { os: 'macOS',   icon: '&#127822;', ext: '.dmg',  label: 'macOS Disk Image' },
+    ]
+  }
+];
+
+function formatBytes(b) {
+  if (!b) return '';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function loadRelease(proj) {
+  const el = {
+    version:   document.getElementById(proj.prefix + '-version'),
+    section:   document.getElementById(proj.prefix + '-release-section'),
+    downloads: document.getElementById(proj.prefix + '-release-downloads'),
+  };
+
+  try {
+    const rel = await fetchJSON(`https://api.github.com/repos/${OWNER}/${proj.repo}/releases/latest`);
+    el.version.textContent = rel.tag_name;
+    el.section.style.display = '';
+
+    let html = '';
+    for (const p of proj.platforms) {
+      const asset = rel.assets.find(a => a.name.endsWith(p.ext));
+      if (!asset) continue;
+      html += `<a class="dl-card" href="${asset.browser_download_url}" target="_blank">
+        <span class="dl-icon">${p.icon}</span>
+        <div class="dl-info">
+          <div class="dl-platform">${p.label}</div>
+          <div class="dl-meta">${asset.name} &middot; ${formatBytes(asset.size)}</div>
+        </div></a>`;
+    }
+    if (!html) {
+      html = `<a class="dl-card" href="${rel.html_url}" target="_blank">
+        <span class="dl-icon">&#128230;</span>
+        <div class="dl-info">
+          <div class="dl-platform">View Release</div>
+          <div class="dl-meta">${rel.tag_name} &middot; ${rel.assets.length} assets</div>
+        </div></a>`;
+    }
+    el.downloads.innerHTML = html;
+  } catch (e) {
+    el.version.textContent = 'no release yet';
+    el.version.className = 'badge badge-release';
+  }
+}
+
+async function loadCI(proj) {
+  const el = document.getElementById(proj.prefix + '-ci');
+  try {
+    const data = await fetchJSON(
+      `https://api.github.com/repos/${OWNER}/${proj.repo}/actions/runs?branch=main&status=completed&per_page=1`
+    );
+    if (data.workflow_runs && data.workflow_runs.length) {
+      const run = data.workflow_runs[0];
+      const ok = run.conclusion === 'success';
+      el.innerHTML = `<span class="status-dot ${ok ? 'dot-green' : 'dot-red'}"></span>CI ${ok ? 'passing' : 'failing'}`;
+    } else {
+      el.textContent = 'CI';
+    }
+  } catch {
+    el.textContent = 'CI';
+  }
+}
+
+PROJECTS.forEach(p => { loadRelease(p); loadCI(p); });
+</script>
+
+</body>
+</html>
