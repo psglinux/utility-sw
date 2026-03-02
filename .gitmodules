@@ -1,0 +1,3 @@
+[submodule "scp-ftp-tftp"]
+	path = scp-ftp-tftp
+	url = git@github.com:psglinux/scp-ftp-tftp.git

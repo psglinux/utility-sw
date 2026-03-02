@@ -1,0 +1,79 @@
+name: CI — Submodule Integrity
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    name: Verify submodules
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Validate .gitmodules
+        run: |
+          if [ ! -f .gitmodules ]; then
+            echo "No .gitmodules found — nothing to validate."
+            exit 0
+          fi
+          echo "Registered submodules:"
+          git config --file .gitmodules --get-regexp path | while read key path; do
+            echo "  $path"
+            if [ ! -d "$path/.git" ] && [ ! -f "$path/.git" ]; then
+              echo "  ERROR: submodule '$path' not initialised"
+              exit 1
+            fi
+            ACTUAL=$(git -C "$path" rev-parse HEAD)
+            EXPECTED=$(git ls-tree HEAD "$path" | awk '{print $3}')
+            if [ "$ACTUAL" != "$EXPECTED" ]; then
+              echo "  WARNING: checked-out commit ($ACTUAL) differs from recorded ($EXPECTED)"
+            else
+              echo "  OK  commit $ACTUAL"
+            fi
+          done
+
+      - name: Quick build check (Linux)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qt6-base-dev libcurl4-openssl-dev \
+            libgl1-mesa-dev libglu1-mesa-dev
+          for sub in $(git config --file .gitmodules --get-regexp path | awk '{print $2}'); do
+            if [ -f "$sub/CMakeLists.txt" ]; then
+              echo "========================================"
+              echo " Building submodule: $sub"
+              echo "========================================"
+              cmake -B "$sub/build-ci" -S "$sub" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF
+              cmake --build "$sub/build-ci" --config Release --parallel
+            fi
+          done
+
+  notify:
+    needs: verify
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send failure email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "[utility-sw CI] Build FAILED on ${{ github.ref_name }}"
+          to: psglinux@gmail.com
+          from: utility-sw CI <${{ secrets.SMTP_USERNAME }}>
+          body: |
+            CI failed for utility-sw.
+
+            Branch:  ${{ github.ref_name }}
+            Commit:  ${{ github.sha }}
+            Author:  ${{ github.actor }}
+
+            Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
